@@ -1,0 +1,37 @@
+{
+  "siteName": "Ministry Intranet",
+  "siteDescription": "Communication portal for ministry departments",
+  "siteTemplate": "COMMUNICATION#0",
+  "webParts": [
+    {
+      "title": "Homepage Hero",
+      "type": "Hero",
+      "properties": {
+        "layout": "FullWidth",
+        "items": 3
+      }
+    },
+    {
+      "title": "Department Quick Links",
+      "type": "QuickLinks",
+      "properties": {
+        "links": [
+          {"title": "HR", "url": "/sites/ministry/hr"},
+          {"title": "Finance", "url": "/sites/ministry/finance"},
+          {"title": "IT", "url": "/sites/ministry/it"},
+          {"title": "Legal", "url": "/sites/ministry/legal"}
+        ]
+      }
+    }
+  ],
+  "lists": [
+    {
+      "title": "HR Documents",
+      "template": "DOCUMENT_LIBRARY",
+      "columns": [
+        {"name": "DocumentType", "type": "Choice"},
+        {"name": "Confidentiality", "type": "Metadata"}
+      ]
+    }
+  ]
+}
