@@ -1,0 +1,98 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/sp/v2/row-formatting.schema.json",
+  "hideSelection": true,
+  "hideColumnHeader": true,
+  "rowFormatter": {
+    "elmType": "div",
+    "attributes": {
+      "class": "ms-bgColor-neutralLighter ms-borderColor-neutralLight"
+    },
+    "style": {
+      "display": "flex",
+      "flex-direction": "column",
+      "width": "240px",
+      "margin": "8px",
+      "padding": "16px",
+      "border-radius": "4px",
+      "box-shadow": "0 1.6px 3.6px 0 rgba(0,0,0,0.13)"
+    },
+    "children": [
+      {
+        "elmType": "div",
+        "style": {
+          "display": "flex",
+          "align-items": "center",
+          "margin-bottom": "12px"
+        },
+        "children": [
+          {
+            "elmType": "img",
+            "attributes": {
+              "src": "=getUserImage([$Email], 'S')"
+            },
+            "style": {
+              "width": "48px",
+              "height": "48px",
+              "border-radius": "50%",
+              "margin-right": "12px"
+            }
+          },
+          {
+            "elmType": "div",
+            "style": {
+              "display": "flex",
+              "flex-direction": "column"
+            },
+            "children": [
+              {
+                "elmType": "div",
+                "style": {
+                  "font-size": "14px",
+                  "font-weight": "600"
+                },
+                "txtContent": "[$Name]"
+              },
+              {
+                "elmType": "div",
+                "style": {
+                  "font-size": "12px",
+                  "color": "[theme:neutralSecondary]"
+                },
+                "txtContent": "[$Role]"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "elmType": "div",
+        "style": {
+          "display": "flex",
+          "align-items": "center",
+          "margin-top": "8px"
+        },
+        "children": [
+          {
+            "elmType": "a",
+            "attributes": {
+              "href": "='mailto:' + [$Email]",
+              "iconName": "Mail",
+              "class": "ms-fontColor-themePrimary"
+            },
+            "style": {
+              "margin-right": "12px"
+            }
+          },
+          {
+            "elmType": "a",
+            "attributes": {
+              "href": "='https://teams.microsoft.com/l/chat/0/0?users=' + [$Email]",
+              "iconName": "Chat",
+              "class": "ms-fontColor-themePrimary"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

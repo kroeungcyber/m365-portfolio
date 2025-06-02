@@ -26,12 +26,91 @@
   ],
   "lists": [
     {
+      "title": "Announcements",
+      "template": "GENERIC_LIST",
+      "columns": [
+        {"name": "Title", "type": "Text"},
+        {"name": "Priority", "type": "Choice"},
+        {"name": "ExpiryDate", "type": "DateTime"}
+      ],
+      "formatting": "./announcement-formatting.json"
+    },
+    {
       "title": "HR Documents",
       "template": "DOCUMENT_LIBRARY",
       "columns": [
         {"name": "DocumentType", "type": "Choice"},
         {"name": "Confidentiality", "type": "Metadata"}
-      ]
+      ],
+      "formatting": "./document-library-formatting.json"
+    },
+    {
+      "title": "Department Contacts",
+      "template": "CONTACTS",
+      "columns": [
+        {"name": "Name", "type": "Text"},
+        {"name": "Role", "type": "Text"},
+        {"name": "Email", "type": "Text"}
+      ],
+      "formatting": "./contacts-formatting.json"
     }
-  ]
+  ],
+  "searchSettings": {
+    "verticals": [
+      {
+        "name": "Departments",
+        "queryTemplate": "contentclass:STS_Site AND Department:{searchTerms}"
+      },
+      {
+        "name": "Documents",  
+        "queryTemplate": "contentclass:STS_ListItem_DocumentLibrary"
+      },
+      {
+        "name": "People",
+        "queryTemplate": "contentclass:STS_ListItem_UserInfo"
+      }
+    ]
+  },
+  "mobileSettings": {
+    "responsiveBreakpoints": {
+      "small": 576,
+      "medium": 768,
+      "large": 992
+    },
+    "mobileNavigation": "Collapsible",
+    "touchOptimized": true
+  },
+  "governance": {
+    "permissionLevels": [
+      {
+        "name": "Admin",
+        "permissions": ["FullControl"]
+      },
+      {
+        "name": "Editor",
+        "permissions": ["Edit", "Delete", "View"]
+      },
+      {
+        "name": "Reader",
+        "permissions": ["View"]
+      }
+    ],
+    "contentLifecycle": {
+      "reviewFrequency": "Quarterly",
+      "archiveAfter": "2 years",
+      "deleteAfter": "5 years"
+    }
+  },
+  "knowledgeBase": {
+    "wikiLibrary": {
+      "title": "Ministry Knowledge Base",
+      "sections": [
+        "Policies",
+        "Procedures", 
+        "Best Practices",
+        "Historical Records"
+      ],
+      "versioning": true
+    }
+  }
 }

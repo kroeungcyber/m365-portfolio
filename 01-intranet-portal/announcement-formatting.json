@@ -1,0 +1,55 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/sp/v2/row-formatting.schema.json",
+  "hideSelection": true,
+  "hideColumnHeader": true,
+  "rowFormatter": {
+    "elmType": "div",
+    "style": {
+      "display": "flex",
+      "flex-wrap": "wrap",
+      "gap": "16px"
+    },
+    "children": [
+      {
+        "elmType": "div",
+        "attributes": {
+          "class": "ms-bgColor-neutralLighter ms-borderColor-neutralLight"
+        },
+        "style": {
+          "width": "300px",
+          "padding": "16px",
+          "border-radius": "4px",
+          "box-shadow": "0 1.6px 3.6px 0 rgba(0,0,0,0.13)"
+        },
+        "children": [
+          {
+            "elmType": "div",
+            "style": {
+              "font-size": "14px",
+              "font-weight": "600",
+              "margin-bottom": "8px"
+            },
+            "txtContent": "[$Title]"
+          },
+          {
+            "elmType": "div",
+            "style": {
+              "font-size": "12px",
+              "color": "[$Priority.color]",
+              "margin-bottom": "8px"
+            },
+            "txtContent": "[$Priority]"
+          },
+          {
+            "elmType": "div",
+            "style": {
+              "font-size": "12px",
+              "color": "[theme:neutralSecondary]"
+            },
+            "txtContent": "=if([$ExpiryDate] == '', '', 'Expires: ' + toLocaleDateString([$ExpiryDate]))"
+          }
+        ]
+      }
+    ]
+  }
+}
