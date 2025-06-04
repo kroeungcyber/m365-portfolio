@@ -1,0 +1,27 @@
+{
+  "auth": {
+    "clientId": "YOUR_APP_CLIENT_ID",
+    "authority": "https://login.microsoftonline.com/YOUR_TENANT_ID",
+    "redirectUri": "http://localhost:3000",
+    "scopes": [
+      "user.read",
+      "api://YOUR_APP_CLIENT_ID/access_as_user"
+    ]
+  },
+  "rbac": {
+    "roles": {
+      "admin": {
+        "groups": ["YOUR_ADMIN_GROUP_ID"],
+        "permissions": ["*"]
+      },
+      "manager": {
+        "groups": ["YOUR_MANAGER_GROUP_ID"],
+        "permissions": ["read", "write", "approve"]
+      },
+      "employee": {
+        "groups": ["YOUR_EMPLOYEE_GROUP_ID"],
+        "permissions": ["read", "submit"]
+      }
+    }
+  }
+}

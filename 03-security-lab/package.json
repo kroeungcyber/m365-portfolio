@@ -1,0 +1,22 @@
+{
+  "name": "m365-portfolio-security",
+  "version": "1.0.0",
+  "description": "RBAC/IAM security module for M365 Portfolio",
+  "main": "authMiddleware.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@azure/msal-node": "^2.0.0",
+    "express": "^4.18.2"
+  },
+  "keywords": [
+    "m365",
+    "security",
+    "rbac",
+    "iam",
+    "azuread"
+  ],
+  "author": "M365 Portfolio Team",
+  "license": "MIT"
+}
