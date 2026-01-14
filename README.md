@@ -149,7 +149,7 @@ m365-portfolio/
 
 ## 📬 Contact
 
-For inquiries, reach out via [LinkedIn](https://www.linkedin.com/in/kroeungcyber) or email.
+For inquiries, reach out via [LinkedIn](https://www.linkedin.com/company/kroeungcyber) or email.
 
 ---
 
