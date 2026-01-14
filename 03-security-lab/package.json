@@ -2,13 +2,21 @@
   "name": "m365-portfolio-security",
   "version": "1.0.0",
   "description": "RBAC/IAM security module for M365 Portfolio",
-  "main": "authMiddleware.js",
+  "main": "app.js",
   "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "@azure/msal-node": "^2.0.0",
-    "express": "^4.18.2"
+    "dotenv": "^17.2.3",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "joi": "^17.11.0",
+    "winston": "^3.11.0"
   },
   "keywords": [
     "m365",

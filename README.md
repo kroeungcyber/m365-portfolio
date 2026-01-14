@@ -1,59 +1,47 @@
-# Microsoft 365 Project Portfolio
+# Microsoft 365 SME Digital Transformation Portfolio
 
-This portfolio showcases hands-on Microsoft 365 projects designed to demonstrate expertise in configuring, customizing, securing, and supporting Microsoft 365 services like SharePoint, Teams, OneDrive, and Power Platform.
+[![SME Roadmap](https://img.shields.io/badge/Roadmap-SME%20Transformation-orange.svg)](SME-TRANSFORMATION.md)
+[![Security Policy](https://img.shields.io/badge/Security-Policy-brightgreen.svg)](SECURITY.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+This portfolio demonstrates a comprehensive toolkit for **Digital Transformation in Small and Medium Enterprises (SMEs)**. By leveraging Microsoft 365, these projects show how SMEs can achieve enterprise-grade security, collaboration, and automation without a massive IT budget.
 
 ---
 
 ## 📁 Projects Overview
 
 ### 1. Ministry Intranet Portal (SharePoint + Teams)
+[![Governance Policy](https://img.shields.io/badge/Policy-Governance-blue.svg)](01-intranet-portal/GOVERNANCE.md)
 
-**Summary:** Built a full-featured intranet communication portal with integrated Teams collaboration for a mock ministry department.
+**Summary:** A full-featured intranet communication portal with integrated Teams collaboration, featuring advanced governance and automated metadata.
 
-**Features:**
-
-* SharePoint communication site with custom homepage, document libraries, and metadata.
-* Integrated Teams channels for HR, Finance, IT, Legal.
-* Document versioning and OneDrive syncing.
-* Power Automate for department-wide announcement alerts.
-
-**Skills Demonstrated:**
-
-* SharePoint customization, OneDrive integration, Power Automate flows, Teams governance.
+**Key Highlights:**
+* **Hub-and-Spoke Architecture**: Scalable SharePoint site structure with centralized news and departmental spokes.
+* **Automated Governance**: Detailed permission levels and content lifecycle management (documented in `GOVERNANCE.md`).
+* **Intelligent Automation**: Power Automate workflows for cross-platform announcements (Teams/Outlook).
 
 ---
 
 ### 2. Workflow Automation for Leave Requests (Power Platform)
 
-**Summary:** Automated employee leave request process using Power Apps, Power Automate, and SharePoint.
+**Summary:** End-to-end automation of employee leave requests using the Power Platform, optimizing business processes and user experience.
 
-**Features:**
-
-* Power Apps canvas app for user submissions.
-* Power Automate approvals (employee → manager → HR).
-* SharePoint list as backend for data tracking.
-* Notifications via Teams and Outlook.
-
-**Skills Demonstrated:**
-
-* Power Platform development, workflow design, user experience optimization, automation.
+**Key Highlights:**
+* **Canvas App Interface**: High-fidelity Power Apps UI with dynamic form validation.
+* **Multi-Stage Logic**: Complex approval workflows using Power Automate (Manager → HR sequential approvals).
+* **Omnichannel Notifications**: Adaptive cards for Teams and customized Outlook notifications.
 
 ---
 
-### 3. Security & Compliance Lab
+### 3. Security & Compliance Lab (Production-Ready Demo)
+[![Security Policy](https://img.shields.io/badge/Policy-Security-brightgreen.svg)](03-security-lab/SECURITY.md)
 
-**Summary:** Designed and deployed Microsoft 365 security and compliance configurations to mirror regulatory requirements.
+**Summary:** A high-level security implementation featuring a **workable Node.js demo** of RBAC and identity management using Microsoft Entra ID.
 
-**Features:**
-
-* DLP policies for OneDrive and SharePoint.
-* Sensitivity labels (e.g., "Confidential", "Internal Use").
-* Retention policies and audit logging.
-* Conditional access and MFA enforcement.
-
-**Skills Demonstrated:**
-
-* Microsoft Purview, Microsoft Entra, Information Protection, Compliance Center configurations.
+**Key Highlights:**
+* **Workable Demo**: Includes a production-ready Express server (`app.js`) with structured logging and environment validation.
+* **Hardened Security**: Implements Helmet.js, Rate Limiting, and Joi validation for enterprise-grade API protection.
+* **Identity Management**: Demonstrates MSAL OBO (On-Behalf-Of) flow and group-based access control.
 
 ---
 
@@ -131,16 +119,29 @@ Each project folder includes:
 
 ---
 
-## 🗂 Folder Structure Example
+## 🚀 Quick Start / Testing the Demo
+
+To test the **Security Lab** production-ready demo:
+1. Navigate to the module: `cd 03-security-lab`
+2. Set up your environment: `cp .env.example .env` (Update with your Entra ID credentials)
+3. Install dependencies: `npm install`
+4. Start the server: `npm start`
+5. Run the testing script: `./test-demo.sh`
+
+## 🗂 Folder Structure
 
 ```
 m365-portfolio/
-├── 01-intranet-portal/
-├── 02-workflow-automation/
-├── 03-security-lab/
-├── 04-custom-teams-app/
-├── 05-training-support-portal/
-├── 06-documentation-library/
+├── 01-intranet-portal/        # SharePoint structure & Governance Framework
+├── 02-workflow-automation/    # Power Platform apps & flows
+├── 03-security-lab/           # Production-ready Security API & RBAC Demo
+│   ├── app.js                 # Demo Server
+│   ├── authMiddleware.js      # Entra ID Middleware
+│   └── test-demo.sh           # Automated Testing Script
+├── 04-custom-teams-app/       # Teams integration solutions
+├── 05-training-support-portal/# User adoption & training resources
+├── 06-documentation-library/  # Document lifecycle management
+├── SECURITY.md                # Project-wide Security Posture
 └── README.md
 ```
 
@@ -148,7 +149,7 @@ m365-portfolio/
 
 ## 📬 Contact
 
-For inquiries, reach out via [LinkedIn](#) or email.
+For inquiries, reach out via [LinkedIn](https://www.linkedin.com/in/kroeungcyber) or email.
 
 ---
 

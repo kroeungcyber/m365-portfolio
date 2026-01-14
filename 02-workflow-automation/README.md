@@ -6,11 +6,11 @@ This project automates the employee leave request process using Power Apps, Powe
 
 ## 🧩 Features Implemented
 
-* **Power Apps Canvas App** for employee leave request submissions with form validation
-* **Multi-stage Approval Workflow** (employee → manager → HR) using Power Automate
-* **SharePoint List Integration** for tracking leave requests and statuses
-* **Notifications** via Teams and Outlook at each approval stage
-* **Calendar Integration** showing approved leave dates
+* **Power Apps Canvas App**: User-friendly interface for leave submissions with dynamic form validation and data filtering.
+* **Multi-stage Approval Workflow**: Advanced Power Automate logic implementing sequential and parallel approvals (Employee → Manager → HR).
+* **SharePoint List Backend**: Structured data storage using SharePoint lists with specialized column formatting for status tracking.
+* **Omnichannel Notifications**: Real-time alerts delivered via Microsoft Teams Adaptive Cards and customized Outlook emails.
+* **Auto-Calendar Integration**: Automatically updates Outlook and SharePoint calendars upon final request approval.
 
 ## 🛠️ Technologies Used
 

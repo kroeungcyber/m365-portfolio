@@ -1,53 +1,50 @@
-# Custom Teams App (Power Apps)
+# Custom Teams App
 
 ## 📝 Project Summary
 
-This project demonstrates building a custom Microsoft Teams application using Power Apps for internal event planning and document access, showcasing Teams development capabilities.
+This project showcases a custom Microsoft Teams application developed to enhance internal productivity by centralizing event planning and document access directly within the Teams interface.
 
 ## 🧩 Features Implemented
 
-* **Power App Embedded in Teams** as a personal tab
-* **SharePoint Integration** for event data storage
-* **Mock Graph API** for calendar integration
-* **Responsive UI** that works on desktop and mobile
-* **Document Access** with permission filtering
+* **Embedded Teams Tab**: A Power Apps canvas application seamlessly integrated as a personal or channel tab.
+* **SharePoint Integration**: Bi-directional data sync with SharePoint Online for real-time event tracking and document retrieval.
+* **Context-Aware UI**: Responsive design that adapts to Teams desktop, web, and mobile clients, utilizing Teams-specific themes.
+* **Microsoft Graph API (Mocked)**: Conceptual integration with Graph API for calendar scheduling and user profile discovery.
 
 ## 🛠️ Technologies Used
 
-* Microsoft Teams
+* Microsoft Teams (Developer Portal)
 * Power Apps
 * SharePoint Online
-* (Mock) Microsoft Graph API
+* Microsoft Graph API
+* Fluent UI (Teams Design System)
 
 ## 📁 Folder Contents
 
 ```
 04-custom-teams-app/
-├── app/                          # Power App source files (mock)
-├── screenshots/                  # UI mockups: desktop, mobile views
-├── event-list-schema.json        # SharePoint list structure (mock)
-├── api-mock.json                 # Sample Graph API responses
+├── app-manifest.json           # Teams App Manifest (mock)
+├── teams-app-export.zip        # Power Apps / Teams app package (mock)
+├── screenshots/                # App UI in desktop and mobile Teams
 └── README.md
 ```
 
 ## ✅ Skills Demonstrated
 
-* Teams app development and deployment
-* Power Apps canvas app design
-* SharePoint list integration
-* API design and mocking
-* Responsive UI development
+* Microsoft 365 App Development
+* Teams Tab & Personal App configuration
+* Adaptive UI/UX design for collaborative workspaces
+* API integration and data connectivity
+* Teams Governance and App Deployment
 
 ## 📘 Documentation & Notes
 
-* The app uses a SharePoint list as its data source for events
-* Document access respects SharePoint permissions
-* UI adapts to Teams desktop and mobile clients
+* The app follows the Microsoft Teams App Design Guidelines.
+* Security is managed through Entra ID authentication within the Teams context.
 
 ## 📌 Future Enhancements
 
-* Replace mock API with real Graph API integration
-* Add meeting scheduling capability
-* Implement SSO with Microsoft Entra
+* Implement Teams Messaging Extensions for quick actions.
+* Add Bot Framework integration for AI-powered assistant.
 
-> ⚠️ Note: All configurations use simulated data and mocked APIs
+> ⚠️ Note: All configurations and screenshots use simulated data

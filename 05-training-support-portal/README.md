@@ -2,15 +2,14 @@
 
 ## 📝 Project Summary
 
-This project creates a comprehensive self-help and training portal using SharePoint Online, Forms, Power BI, and Power Apps to demonstrate user enablement capabilities in Microsoft 365.
+This project demonstrates a comprehensive self-service support and training ecosystem built on Microsoft 365. It empowers end-users with the resources they need to adopt and master M365 tools, while providing IT with valuable usage insights.
 
 ## 🧩 Features Implemented
 
-* **SharePoint Support Site** with how-to guides and embedded training videos
-* **Forms-based Training** with quizzes and feedback collection
-* **Power App** for IT issue submission and routing
-* **Power BI Dashboard** (mocked) for usage analytics
-* **Knowledge Base** with searchable articles
+* **Centralized SharePoint Hub**: A dedicated site featuring interactive how-to guides, video libraries, and FAQs.
+* **Interactive Training Quizzes**: Microsoft Forms-based assessments to gauge user proficiency and collect feedback.
+* **Smart Support Routing**: A Power Apps-based issue submission tool that automatically routes tickets to the appropriate department.
+* **Mock Analytics Dashboard**: Power BI visualizations (mocked) demonstrating user engagement and common support pain points.
 
 ## 🛠️ Technologies Used
 
@@ -18,37 +17,35 @@ This project creates a comprehensive self-help and training portal using SharePo
 * Microsoft Forms
 * Power Apps
 * Power BI
-* Microsoft Stream
+* Microsoft Stream (on SharePoint)
 
 ## 📁 Folder Contents
 
 ```
 05-training-support-portal/
-├── site-template.json            # SharePoint site template (mock)
-├── screenshots/                  # Portal views, dashboard, forms
-├── training-quiz.json            # Forms export (mock)
-├── support-app.msapp             # Power App export (mock)
+├── training-quiz-export.zip    # Microsoft Forms structure (mock)
+├── support-app.msapp           # Power Apps ticket submission tool (mock)
+├── user-guide-template.docx     # Sample SOP/Guide template
+├── screenshots/                # Portal UI and Power BI dashboards
 └── README.md
 ```
 
 ## ✅ Skills Demonstrated
 
-* End-user training content creation
-* Service adoption strategy
-* Help desk solution design
-* Analytics and reporting
-* User experience optimization
+* Digital Adoption and End-User Enablement
+* Content Lifecycle Management
+* Cross-service integration (Forms + Apps + SharePoint)
+* Service design and helpdesk process mapping
+* Data-driven decision making via analytics
 
 ## 📘 Documentation & Notes
 
-* The portal includes role-based content for different user groups
-* Training completion is tracked via Forms responses
-* The Power App routes issues to appropriate support teams
+* The portal is designed to reduce helpdesk volume by 30% through proactive self-service.
+* Content is categorized by application (Teams, Excel, SharePoint, etc.) for easy navigation.
 
 ## 📌 Future Enhancements
 
-* Add AI-powered search for knowledge base
-* Implement chatbot integration
-* Expand to mobile app version
+* Integrate a Viva Learning tab for personalized training.
+* Add an AI-powered chatbot for 24/7 instant support.
 
 > ⚠️ Note: All configurations and screenshots use simulated data

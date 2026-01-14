@@ -6,11 +6,11 @@ This project simulates a modern intranet portal for a ministry, using SharePoint
 
 ## 🧩 Features Implemented
 
-* **SharePoint Communication Site** with a custom homepage, departmental quick links, and calendar web parts.
-* **Document Libraries** organized by department with custom metadata and versioning.
-* **Microsoft Teams Integration** with dedicated channels for HR, Finance, IT, and Legal.
-* **OneDrive Syncing** for offline access to shared documents.
-* **Automated Announcements** using Power Automate to notify Teams channels and Outlook when news is published.
+* **SharePoint Communication Site**: Custom homepage with Hero web parts, departmental quick links, and dynamic news.
+* **Intelligent Document Libraries**: Metadata-driven organization (using `department-metadata.xlsx`) with versioning and sensitivity labeling.
+* **Microsoft Teams Integration**: Seamless collaboration with dedicated channels for HR, Finance, IT, and Legal, featuring integrated SharePoint tabs.
+* **Advanced Governance**: Pre-defined permission levels (Admin, Editor, Reader) and content lifecycle management as detailed in `site-schema.json`.
+* **Automated Announcements**: Power Automate workflows that trigger on news publication, pushing alerts to Teams and Outlook.
 
 ## 🛠️ Technologies Used
 
@@ -23,10 +23,13 @@ This project simulates a modern intranet portal for a ministry, using SharePoint
 
 ```
 01-intranet-portal/
-├── site-schema.json                # SharePoint site structure export (mock)
+├── site-schema.json                # Comprehensive SharePoint site structure & governance
+├── announcement-formatting.json    # JSON formatting for the Announcements list
+├── document-library-formatting.json # JSON column formatting for HR Documents
+├── contacts-formatting.json        # JSON view formatting for Department Contacts
 ├── screenshots/                    # UI mockups: homepage, libraries, Teams
-├── announcement-flow.zip           # Power Automate flow export (mock)
-├── department-metadata.xlsx        # Example metadata for libraries
+├── announcement-flow.zip           # Power Automate flow export (logic template)
+├── department-metadata.xlsx        # Taxonomy and metadata schema
 └── README.md
 ```
 
@@ -45,8 +48,9 @@ This project simulates a modern intranet portal for a ministry, using SharePoint
 
 ## 📘 Documentation & Notes
 
-* See `department-metadata.xlsx` for the taxonomy used in library tagging.
-* The Power Automate flow triggers when a new news item is published to the homepage and pushes alerts to a Teams channel and department-wide email group.
+* **Governance Framework**: Detailed permission models and lifecycle policies are documented in [GOVERNANCE.md](./GOVERNANCE.md).
+* **Metadata Schema**: See `department-metadata.xlsx` for the taxonomy used in library tagging.
+* **Automation Logic**: The Power Automate flow triggers when a new news item is published to the homepage and pushes alerts to a Teams channel and department-wide email group.
 
 ## 📌 Future Enhancements
 

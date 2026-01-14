@@ -6,21 +6,45 @@ This project demonstrates Microsoft 365 security and compliance configurations t
 
 ## 🔐 Role-Based Access Control (RBAC) Implementation
 
-### Authentication & Authorization
-- **Azure AD Authentication** using MSAL.js
+### Authentication & Authorization Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant API as Security API
+    participant Entra as Microsoft Entra ID
+
+    User->>Frontend: Login Request
+    Frontend->>Entra: Auth Code Request
+    Entra-->>User: MFA/Login Prompt
+    User->>Entra: Credentials
+    Entra-->>Frontend: Auth Code
+    Frontend->>API: Request with Auth Code
+    API->>Entra: OBO Flow (Acquire Token)
+    Entra-->>API: Access Token + Claims
+    API->>API: Check Group Claims (RBAC)
+    API-->>Frontend: Authorized Response
+```
+
+- **Microsoft Entra ID Authentication** using MSAL.js
 - **RBAC Middleware** for route protection
 - **Group-based permissions** mapped to roles
 
 ### Configuration
-1. Create an Azure AD application
-2. Configure auth-config.json with:
-   - Client ID
-   - Tenant ID
-   - Redirect URI
-   - Azure AD group IDs for roles
-3. Install dependencies:
+1. Create a **Microsoft Entra ID** (formerly Azure AD) application registration.
+2. Create a `.env` file based on `.env.example`:
    ```bash
-   npm install @azure/msal-node
+   cp .env.example .env
+   ```
+3. Update `.env` with your Entra ID details:
+   - `CLIENT_ID`: Your Application (client) ID
+   - `TENANT_ID`: Your Directory (tenant) ID
+   - `REDIRECT_URI`: Your application's redirect URI (e.g., `http://localhost:3000`)
+   - `ADMIN_GROUP_ID`, `MANAGER_GROUP_ID`, `EMPLOYEE_GROUP_ID`: Object IDs of corresponding Entra ID groups.
+4. Install dependencies:
+   ```bash
+   npm install
    ```
 
 ### Usage
@@ -57,12 +81,13 @@ router.post('/admin', authenticate, authorize(['admin']), (req, res) => {...});
 
 ```
 03-security-lab/
-├── auth-config.json              # RBAC configuration
-├── authMiddleware.js            # Authentication middleware
+├── .env.example                 # Environment variable template
+├── authMiddleware.js            # Node.js authentication & RBAC middleware
+├── SECURITY.md                  # Security policy and best practices
+├── package.json                 # Node.js dependencies
 ├── policy-exports/              # JSON exports of security policies (mock)
 ├── screenshots/                 # Security center configurations
 ├── compliance-report.xlsx       # Sample compliance audit
-├── architecture-diagram.png     # Security architecture
 └── README.md
 ```
 
