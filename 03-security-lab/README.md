@@ -1,8 +1,62 @@
 # Security & Compliance Lab
 
+[![Zero Trust](https://img.shields.io/badge/Architecture-Zero%20Trust-blue.svg)](ZERO-TRUST.md)
+[![AI Defense](https://img.shields.io/badge/Defense-AI%20Agent%20Hardened-red.svg)](aiAgentDefense.js)
+[![Security Policy](https://img.shields.io/badge/Policy-Security-brightgreen.svg)](SECURITY.md)
+
 ## 📝 Project Summary
 
-This project demonstrates Microsoft 365 security and compliance configurations that mirror enterprise regulatory requirements, showcasing expertise in protecting data and meeting compliance standards.
+This project demonstrates a **production-hardened** Microsoft 365 security and compliance implementation, featuring a Zero Trust API server with dedicated defenses against the rising threat of **AI agent-based attacks**.
+
+---
+
+## 🤖 AI Agent Defense Architecture
+
+Modern AI agents can autonomously enumerate APIs, replay tokens, and chain vulnerabilities at machine speed. This lab implements 8 layers of defense:
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                      INCOMING REQUEST                        │
+└──────────────────────────┬───────────────────────────────────┘
+                           │
+          ┌────────────────▼────────────────┐
+          │  L1: Helmet CSP + Security Hdrs │  ← X-Robots-Tag, HSTS, CSP
+          └────────────────┬────────────────┘
+                           │
+          ┌────────────────▼────────────────┐
+          │  L2: AI Agent / Bot Detection   │  ← 28+ User-Agent patterns
+          └────────────────┬────────────────┘
+                           │
+          ┌────────────────▼────────────────┐
+          │  L3: Tiered Rate Limiting       │  ← Global + per-route limits
+          └────────────────┬────────────────┘
+                           │
+          ┌────────────────▼────────────────┐
+          │  L4: Strict CORS Enforcement    │  ← Origin allowlist
+          └────────────────┬────────────────┘
+                           │
+          ┌────────────────▼────────────────┐
+          │  L5: Token Replay Prevention    │  ← JWT jti nonce store
+          └────────────────┬────────────────┘
+                           │
+          ┌────────────────▼────────────────┐
+          │  L6: JWT Cryptographic Verify   │  ← RS256 + JWKS
+          └────────────────┬────────────────┘
+                           │
+          ┌────────────────▼────────────────┐
+          │  L7: MSAL OBO Flow              │  ← Entra ID token exchange
+          └────────────────┬────────────────┘
+                           │
+          ┌────────────────▼────────────────┐
+          │  L8: RBAC Authorization         │  ← Group-based permissions
+          └────────────────┬────────────────┘
+                           │
+                    ✅ AUTHORIZED
+```
+
+> 📄 Full architecture details: [ZERO-TRUST.md](ZERO-TRUST.md)
+
+---
 
 ## 🔐 Role-Based Access Control (RBAC) Implementation
 
@@ -13,23 +67,25 @@ sequenceDiagram
     participant User
     participant Frontend
     participant API as Security API
+    participant Defense as AI Defense Layer
     participant Entra as Microsoft Entra ID
 
     User->>Frontend: Login Request
     Frontend->>Entra: Auth Code Request
     Entra-->>User: MFA/Login Prompt
-    User->>Entra: Credentials
+    User->>Entra: Credentials + MFA
     Entra-->>Frontend: Auth Code
-    Frontend->>API: Request with Auth Code
+    Frontend->>API: Request with Bearer Token
+    API->>Defense: Check User-Agent (bot detection)
+    API->>Defense: Check token jti (replay prevention)
+    API->>Defense: Check request velocity
+    API->>Entra: JWKS fetch (RS256 key)
+    API->>API: JWT pre-validation (sig/iss/aud/exp)
     API->>Entra: OBO Flow (Acquire Token)
     Entra-->>API: Access Token + Claims
     API->>API: Check Group Claims (RBAC)
     API-->>Frontend: Authorized Response
 ```
-
-- **Microsoft Entra ID Authentication** using MSAL.js
-- **RBAC Middleware** for route protection
-- **Group-based permissions** mapped to roles
 
 ### Configuration
 1. Create a **Microsoft Entra ID** (formerly Azure AD) application registration.
@@ -38,10 +94,12 @@ sequenceDiagram
    cp .env.example .env
    ```
 3. Update `.env` with your Entra ID details:
-   - `CLIENT_ID`: Your Application (client) ID
-   - `TENANT_ID`: Your Directory (tenant) ID
-   - `REDIRECT_URI`: Your application's redirect URI (e.g., `http://localhost:3000`)
-   - `ADMIN_GROUP_ID`, `MANAGER_GROUP_ID`, `EMPLOYEE_GROUP_ID`: Object IDs of corresponding Entra ID groups.
+   - `CLIENT_ID`: Your Application (client) ID (GUID)
+   - `CLIENT_SECRET`: Your application client secret
+   - `TENANT_ID`: Your Directory (tenant) ID (GUID)
+   - `REDIRECT_URI`: Your application's redirect URI
+   - `ADMIN_GROUP_ID`, `MANAGER_GROUP_ID`, `EMPLOYEE_GROUP_ID`: Object IDs of Entra ID groups
+   - `ALLOWED_ORIGINS`: Comma-separated list of allowed CORS origins
 4. Install dependencies:
    ```bash
    npm install
@@ -50,69 +108,112 @@ sequenceDiagram
 ### Usage
 ```javascript
 const { authenticate, authorize } = require('./authMiddleware');
+const { detectAIAgent, preventTokenReplay, detectVelocityAbuse } = require('./aiAgentDefense');
 
-// Protect route with authentication
-router.get('/secure', authenticate, (req, res) => {...});
+// Full Zero Trust protection stack
+router.get('/secure',
+  detectAIAgent,          // Block AI agents/bots
+  detectVelocityAbuse,    // Block enumeration
+  preventTokenReplay,     // Block token replay
+  authenticate,           // Verify identity (JWT + MSAL)
+  (req, res) => { ... }
+);
 
-// Protect route with specific permissions
-router.post('/admin', authenticate, authorize(['admin']), (req, res) => {...});
+// With RBAC
+router.post('/admin',
+  detectAIAgent,
+  preventTokenReplay,
+  authenticate,
+  authorize(['*']),       // Admin only
+  (req, res) => { ... }
+);
 ```
+
+---
 
 ## 🧩 Features Implemented
 
+### Zero Trust & AI Defense
+* **AI Agent Detection**: 28+ User-Agent pattern signatures for known AI frameworks (LangChain, AutoGPT, OpenAI agents, Playwright, Puppeteer, etc.)
+* **Token Replay Prevention**: JWT `jti` nonce tracking — each token is single-use within its TTL
+* **Behavioral Anomaly Detection**: Per-IP velocity tracking (30 req/min threshold on auth routes)
+* **JWT Cryptographic Pre-Validation**: RS256 signature verification via Microsoft's JWKS endpoint before any MSAL call
+* **Header Injection Protection**: Regex sanitization and length limits on Authorization headers
+* **Sanitized Error Responses**: No internal details, stack traces, or MSAL error messages exposed
+
+### Microsoft 365 Security
 * **Data Loss Prevention (DLP)** policies for OneDrive and SharePoint
 * **Sensitivity Labels** ("Confidential", "Internal Use") with encryption
 * **Retention Policies** and audit logging for compliance
 * **Conditional Access** rules with MFA enforcement
 * **Threat Protection** configurations for email and endpoints
-* **RBAC/IAM** system for intranet portal
+* **RBAC/IAM** system with three-tier role model
+
+### API Hardening
+* **Hardened Helmet CSP**: `default-src 'none'` — strictest possible policy
+* **HSTS with Preload**: 1-year HTTPS enforcement
+* **Tiered Rate Limiting**: Global (100/15min) + auth routes (20/5min)
+* **Strict CORS**: Origin allowlist with violation logging
+* **Request Body Limits**: 10KB maximum to prevent payload attacks
+* **Structured Audit Logging**: 12 security event categories for SIEM integration
+
+---
 
 ## 🛠️ Technologies Used
 
 * Microsoft Purview
 * Microsoft Entra ID
 * Microsoft Defender for Office 365
-* Compliance Center
-* Security Center
-* Azure AD Authentication
-* MSAL.js
+* MSAL Node.js (`@azure/msal-node`)
+* `jsonwebtoken` + `jwks-rsa` (JWT cryptographic validation)
+* Express.js + Helmet.js
+* Winston (structured logging)
+
+---
 
 ## 📁 Folder Contents
 
 ```
 03-security-lab/
-├── .env.example                 # Environment variable template
-├── authMiddleware.js            # Node.js authentication & RBAC middleware
-├── SECURITY.md                  # Security policy and best practices
-├── package.json                 # Node.js dependencies
-├── policy-exports/              # JSON exports of security policies (mock)
-├── screenshots/                 # Security center configurations
-├── compliance-report.xlsx       # Sample compliance audit
+├── .env.example          # Environment variable template (with all required vars)
+├── .gitignore            # Excludes .env and node_modules
+├── app.js                # Zero Trust hardened Express server
+├── authMiddleware.js     # JWT pre-validation, MSAL OBO, RBAC middleware
+├── aiAgentDefense.js     # AI agent detection, token replay, velocity defense
+├── logger.js             # Structured security event logging (12 categories)
+├── package.json          # Dependencies (includes jsonwebtoken, jwks-rsa)
+├── SECURITY.md           # Security policy
+├── ZERO-TRUST.md         # Zero Trust architecture & AI agent threat model
+├── test-demo.sh          # API testing script
 └── README.md
 ```
 
+---
+
 ## ✅ Skills Demonstrated
 
+* Zero Trust architecture design
+* AI agent threat modeling and defense
+* JWT cryptographic validation (RS256/JWKS)
+* Token replay attack prevention
+* Behavioral anomaly detection
 * Information protection policy design
-* Compliance framework implementation
+* Compliance framework implementation (NIST 800-207, CIS M365 v3.0, OWASP API Top 10)
 * Identity and access management
 * Threat protection configuration
 * Security reporting and monitoring
-* Azure AD integration
+* Azure AD / Entra ID integration
 * RBAC implementation
 
-## 📘 Documentation & Notes
-
-* DLP policies prevent sharing of sensitive content externally
-* Sensitivity labels automatically encrypt confidential documents
-* Conditional access requires MFA for all admin portals
-* RBAC system uses Azure AD groups for role assignments
+---
 
 ## 📌 Future Enhancements
 
+* Replace in-memory nonce store with Redis for distributed token replay prevention
+* Add Microsoft Sentinel integration for SIEM
+* Implement Privileged Identity Management (PIM)
+* Add Continuous Access Evaluation (CAE) support
+* Deploy behind Azure API Management with WAF rules
 * Add insider risk management policies
-* Implement privileged identity management
-* Expand to Microsoft Sentinel integration
-* Add audit logging for RBAC events
 
-> ⚠️ Note: All configurations use simulated policies and test data
+> ⚠️ Note: All configurations use simulated policies and test data. See [ZERO-TRUST.md](ZERO-TRUST.md) for the full security architecture.

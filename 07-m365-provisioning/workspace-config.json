@@ -1,0 +1,204 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json",
+  "description": "Declarative M365 Workplace Configuration — defines all sites, teams, groups, and policies to provision",
+  "version": "1.0.0",
+  "organization": {
+    "displayName": "Contoso SME",
+    "tenantDomain": "contoso.onmicrosoft.com",
+    "adminEmail": "admin@contoso.onmicrosoft.com"
+  },
+  "sharepoint": {
+    "hubSite": {
+      "title": "Company Intranet Hub",
+      "url": "/sites/intranet-hub",
+      "description": "Central communication hub for all departments",
+      "template": "CommunicationSite",
+      "locale": 1033,
+      "sensitivityLabel": "Internal"
+    },
+    "spokeSites": [
+      {
+        "title": "HR Department",
+        "url": "/sites/hr",
+        "description": "Human Resources documents and policies",
+        "template": "TeamSite",
+        "ownerGroup": "HR-Owners",
+        "memberGroup": "HR-Members",
+        "sensitivityLabel": "Confidential"
+      },
+      {
+        "title": "Finance Department",
+        "url": "/sites/finance",
+        "description": "Finance reports and budget documents",
+        "template": "TeamSite",
+        "ownerGroup": "Finance-Owners",
+        "memberGroup": "Finance-Members",
+        "sensitivityLabel": "Confidential"
+      },
+      {
+        "title": "IT Department",
+        "url": "/sites/it",
+        "description": "IT documentation and service desk",
+        "template": "TeamSite",
+        "ownerGroup": "IT-Owners",
+        "memberGroup": "IT-Members",
+        "sensitivityLabel": "Internal"
+      },
+      {
+        "title": "Legal Department",
+        "url": "/sites/legal",
+        "description": "Legal documents and compliance records",
+        "template": "TeamSite",
+        "ownerGroup": "Legal-Owners",
+        "memberGroup": "Legal-Members",
+        "sensitivityLabel": "Highly Confidential"
+      }
+    ],
+    "retentionPolicies": [
+      {
+        "name": "Financial Records Retention",
+        "retentionYears": 7,
+        "appliesTo": ["Finance"]
+      },
+      {
+        "name": "General Documents Retention",
+        "archiveAfterYears": 2,
+        "appliesTo": ["HR", "IT", "Legal"]
+      }
+    ]
+  },
+  "teams": [
+    {
+      "displayName": "Company All-Hands",
+      "description": "Company-wide announcements and general communication",
+      "visibility": "Private",
+      "channels": [
+        { "name": "General", "description": "General announcements" },
+        { "name": "Announcements", "description": "Official company announcements" },
+        { "name": "IT Support", "description": "IT help and support requests" }
+      ],
+      "ownerGroup": "All-Staff-Owners",
+      "memberGroup": "All-Staff"
+    },
+    {
+      "displayName": "HR Team",
+      "description": "Human Resources internal team",
+      "visibility": "Private",
+      "channels": [
+        { "name": "General", "description": "HR general discussion" },
+        { "name": "Recruitment", "description": "Hiring and onboarding" },
+        { "name": "Leave Management", "description": "Leave request coordination" }
+      ],
+      "ownerGroup": "HR-Owners",
+      "memberGroup": "HR-Members"
+    },
+    {
+      "displayName": "IT Security",
+      "description": "IT Security and compliance team",
+      "visibility": "Private",
+      "channels": [
+        { "name": "General", "description": "Security general discussion" },
+        { "name": "Incidents", "description": "Security incident tracking" },
+        { "name": "Alerts", "description": "Automated security alerts" }
+      ],
+      "ownerGroup": "IT-Security-Owners",
+      "memberGroup": "IT-Security-Members"
+    }
+  ],
+  "entraIdGroups": [
+    {
+      "displayName": "M365-Admins",
+      "description": "Full administrative access to M365 environment",
+      "mailNickname": "m365-admins",
+      "groupType": "Security",
+      "role": "admin"
+    },
+    {
+      "displayName": "M365-Managers",
+      "description": "Manager-level access with approval capabilities",
+      "mailNickname": "m365-managers",
+      "groupType": "Security",
+      "role": "manager"
+    },
+    {
+      "displayName": "M365-Employees",
+      "description": "Standard employee access",
+      "mailNickname": "m365-employees",
+      "groupType": "Security",
+      "role": "employee"
+    },
+    {
+      "displayName": "HR-Members",
+      "description": "HR department members",
+      "mailNickname": "hr-members",
+      "groupType": "Microsoft365"
+    },
+    {
+      "displayName": "Finance-Members",
+      "description": "Finance department members",
+      "mailNickname": "finance-members",
+      "groupType": "Microsoft365"
+    },
+    {
+      "displayName": "IT-Security-Members",
+      "description": "IT Security team members",
+      "mailNickname": "it-security-members",
+      "groupType": "Microsoft365"
+    }
+  ],
+  "sensitivityLabels": [
+    {
+      "name": "Public",
+      "description": "No encryption, open access",
+      "encryption": false,
+      "watermark": false
+    },
+    {
+      "name": "Internal",
+      "description": "Accessible to all employees",
+      "encryption": false,
+      "watermark": false,
+      "restrictExternalSharing": true
+    },
+    {
+      "name": "Confidential",
+      "description": "Encrypted, restricted to specific groups",
+      "encryption": true,
+      "watermark": true,
+      "restrictExternalSharing": true,
+      "requireMFA": true
+    },
+    {
+      "name": "Highly Confidential",
+      "description": "Maximum protection — legal and executive only",
+      "encryption": true,
+      "watermark": true,
+      "restrictExternalSharing": true,
+      "requireMFA": true,
+      "preventDownload": true
+    }
+  ],
+  "conditionalAccess": {
+    "requireMFAForAdmins": true,
+    "requireMFAForAllUsers": true,
+    "blockLegacyAuthentication": true,
+    "requireCompliantDevice": false,
+    "allowedLocations": ["trusted-networks-only"]
+  },
+  "dlpPolicies": [
+    {
+      "name": "Block PII Sharing",
+      "description": "Prevent sharing of National ID, passport numbers, and personal data",
+      "sensitiveInfoTypes": ["National ID", "Passport Number", "Credit Card Number"],
+      "appliesTo": ["SharePoint", "OneDrive", "Teams", "Exchange"],
+      "action": "BlockWithOverride"
+    },
+    {
+      "name": "Block Financial Data",
+      "description": "Prevent external sharing of financial records",
+      "sensitiveInfoTypes": ["Bank Account Number", "SWIFT Code", "Financial Statement"],
+      "appliesTo": ["SharePoint", "OneDrive", "Exchange"],
+      "action": "Block"
+    }
+  ]
+}
