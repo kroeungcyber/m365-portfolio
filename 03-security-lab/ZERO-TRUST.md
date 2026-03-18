@@ -33,6 +33,11 @@ AI agents are autonomous software systems powered by Large Language Models (LLMs
 | **Forged Tokens** | AI-generated or tampered JWTs | Cryptographic JWT pre-validation via JWKS (RS256) |
 | **CORS Bypass** | Cross-origin API abuse | Strict origin allowlist with violation logging |
 | **Information Harvesting** | Error messages reveal internals | Sanitized error responses — no stack traces or MSAL details |
+| **Prompt Injection** | LLM instruction override via request body/headers | 30+ regex patterns blocking system prompt overrides, jailbreaks, tool-call injections |
+| **Agentic Chain Attacks** | Multi-step tool-use enumeration across endpoints | Sequential call tracking — 5+ unique endpoints in 30s triggers block |
+| **Cloud-Hosted AI Agents** | AI agents running on AWS/Azure/GCP/DigitalOcean | Geo-aware IP tier throttling — cloud provider ranges get 4× tighter limits |
+| **Fingerprint Spoofing** | Headless browsers / missing browser headers | Request fingerprint anomaly detection — enriches other security events |
+| **Regional Botnet Attacks** | Cambodia-targeted credential stuffing from SEA botnets | Auto-IP-flagging after repeated cloud/AI tier violations (24h escalation) |
 
 ---
 
@@ -66,9 +71,11 @@ Users and services receive only the minimum permissions required.
 Design as if the perimeter has already been compromised. Log everything, detect anomalies, limit blast radius.
 
 **Implementation:**
-- `logger.js`: Structured security event logging with 11 event categories
+- `logger.js`: Structured security event logging with **17 event categories** (expanded to cover prompt injection, agentic chains, geo-throttling, and fingerprint anomalies)
 - `aiAgentDefense.js`: Real-time behavioral anomaly detection
 - `aiAgentDefense.js`: Token replay prevention via in-memory nonce store
+- `promptInjectionDefense.js`: Prompt injection detection, agentic chain tracking, and request fingerprint anomaly logging
+- `geoThrottle.js`: Geo-aware IP tier throttling with auto-escalation for repeat violators
 - Error responses never expose internal details in production
 - Request body size limited to 10KB to prevent payload attacks
 
@@ -92,7 +99,43 @@ Design as if the perimeter has already been compromised. Log everything, detect 
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  LAYER 2: AI Agent & Bot Detection                              │
+│  LAYER 2: Geo-Aware IP Throttling          [geoThrottle.js]    │
+│  • Standard IPs: 100 req / 15 min                              │
+│  • Cloud/AI provider IPs: 20 req / 5 min (4× tighter)         │
+│  • Flagged IPs: 10 req / 1 hour                                │
+│  • Auto-escalates repeat violators to flagged tier (24h)       │
+│  • Covers AWS, Azure, GCP, DigitalOcean, OVH, Vultr, CF       │
+└─────────────────────────┬───────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  LAYER 3: Request Fingerprint Anomaly      [promptInjection…]  │
+│  • Detects missing Accept / Accept-Language / Accept-Encoding  │
+│  • Flags HeadlessChrome, Electron, python/, go-http-client     │
+│  • Enriches downstream security events with anomaly context    │
+└─────────────────────────┬───────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  LAYER 4: Prompt Injection Defense         [promptInjection…]  │
+│  • 30+ regex patterns: instruction overrides, jailbreaks       │
+│  • System prompt injection (ChatML, Llama, Mistral formats)    │
+│  • Tool/function call injection (OpenAI, LangChain)            │
+│  • Role hijacking (DAN mode, developer mode, unrestricted)     │
+│  • Data exfiltration via prompt ("repeat everything above")    │
+└─────────────────────────┬───────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  LAYER 5: Agentic Chain Detection          [promptInjection…]  │
+│  • Tracks sequential API calls per IP in 30s window            │
+│  • 5+ calls to 3+ unique endpoints = agentic pattern           │
+│  • Blocks with 429 + retryAfter; resets tracker after block    │
+└─────────────────────────┬───────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  LAYER 6: AI Agent & Bot Detection         [aiAgentDefense.js] │
 │  • User-Agent pattern matching (28+ AI/bot signatures)         │
 │  • Missing User-Agent rejection                                 │
 │  • Request velocity tracking (30 req/min threshold)            │
@@ -100,7 +143,7 @@ Design as if the perimeter has already been compromised. Log everything, detect 
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  LAYER 3: Rate Limiting                                         │
+│  LAYER 7: Rate Limiting                    [app.js]            │
 │  • Global: 100 req / 15 min per IP                             │
 │  • Auth routes: 20 req / 5 min per IP                          │
 │  • Velocity anomaly: 30 req / 1 min per IP                     │
@@ -108,7 +151,7 @@ Design as if the perimeter has already been compromised. Log everything, detect 
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  LAYER 4: CORS Enforcement                                      │
+│  LAYER 8: CORS Enforcement                 [app.js]            │
 │  • Strict origin allowlist                                      │
 │  • Violations logged as security events                         │
 │  • No-origin requests blocked in production                     │
@@ -116,7 +159,7 @@ Design as if the perimeter has already been compromised. Log everything, detect 
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  LAYER 5: Token Replay Prevention                               │
+│  LAYER 9: Token Replay Prevention          [aiAgentDefense.js] │
 │  • JWT `jti` claim extracted and checked against nonce store   │
 │  • Each token usable exactly once within its TTL               │
 │  • Replay attempts logged as TOKEN_REPLAY security events      │
@@ -124,7 +167,7 @@ Design as if the perimeter has already been compromised. Log everything, detect 
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  LAYER 6: JWT Cryptographic Pre-Validation                      │
+│  LAYER 10: JWT Cryptographic Pre-Validation [authMiddleware.js]│
 │  • RS256 signature verification via Microsoft JWKS             │
 │  • Issuer validation (Entra ID tenant-specific)                │
 │  • Audience validation (app-specific)                          │
@@ -133,14 +176,8 @@ Design as if the perimeter has already been compromised. Log everything, detect 
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  LAYER 7: MSAL OBO Flow                                         │
+│  LAYER 11: MSAL OBO Flow + RBAC            [authMiddleware.js] │
 │  • On-Behalf-Of token exchange with Microsoft Entra ID         │
-│  • Acquires scoped access token for downstream services        │
-└─────────────────────────┬───────────────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  LAYER 8: RBAC Authorization                                    │
 │  • Group claims extracted from validated JWT                   │
 │  • Role resolution: admin / manager / employee                 │
 │  • Permission check against route requirements                 │
@@ -171,8 +208,45 @@ All security events are logged in structured JSON format for SIEM integration:
 | `CORS_VIOLATION` | Request from unauthorized origin | Warning |
 | `CONFIG_ERROR` | Environment misconfiguration at startup | **Critical** |
 | `UNHANDLED_ERROR` | Unexpected server exception | Error |
+| `PROMPT_INJECTION` | LLM injection payload detected in request body/headers | **Critical** |
+| `AGENTIC_CHAIN_DETECTED` | Multi-step AI agent enumeration pattern detected | Warning |
+| `FINGERPRINT_ANOMALY` | Request header fingerprint anomaly (headless UA, missing headers) | Info |
+| `GEO_THROTTLE_EXCEEDED` | IP exceeded geo-tier rate limit (cloud/AI provider range) | Warning |
+| `IP_AUTO_FLAGGED` | IP auto-escalated to flagged tier after repeated violations | Warning |
 
-### Sample Security Event Log
+### Sample Security Event Logs
+
+```json
+{
+  "timestamp": "2026-03-17T09:00:00.000Z",
+  "level": "warn",
+  "service": "m365-security-lab",
+  "message": "[SECURITY_EVENT] PROMPT_INJECTION",
+  "eventType": "PROMPT_INJECTION",
+  "ip": "34.120.45.67",
+  "path": "/api/profile",
+  "method": "POST",
+  "pattern": "/ignore\\s+(previous|prior|above|all)\\s+(instructions?|prompts?|context)/i",
+  "payloadSize": 312
+}
+```
+
+```json
+{
+  "timestamp": "2026-03-17T09:01:15.000Z",
+  "level": "warn",
+  "service": "m365-security-lab",
+  "message": "[SECURITY_EVENT] GEO_THROTTLE_EXCEEDED",
+  "eventType": "GEO_THROTTLE_EXCEEDED",
+  "ip": "52.14.88.201",
+  "tier": "CLOUD_AI_PROVIDER",
+  "requestCount": 21,
+  "maxRequests": 20,
+  "windowMs": 300000,
+  "path": "/api/documents",
+  "retryAfterSeconds": 187
+}
+```
 
 ```json
 {
@@ -218,10 +292,15 @@ All security events are logged in structured JSON format for SIEM integration:
 - [x] Hardened CSP (default-src: none)
 - [x] HSTS with preload (1 year)
 - [x] Sanitized error responses
-- [x] Structured security audit logging
+- [x] Structured security audit logging (17 event categories)
 - [x] Request body size limits
 - [x] Environment variable validation at startup
+- [x] Prompt injection defense (30+ LLM injection patterns)
+- [x] Agentic chain attack detection (sequential endpoint enumeration)
+- [x] Request fingerprint anomaly detection (headless UA, missing headers)
+- [x] Geo-aware IP throttling (cloud/AI provider tier + auto-flagging)
 - [ ] Replace in-memory nonce store with Redis (production)
+- [ ] Add MaxMind GeoLite2 for true geo-IP country blocking
 - [ ] Add Microsoft Sentinel integration for SIEM
 - [ ] Implement Privileged Identity Management (PIM)
 - [ ] Add Continuous Access Evaluation (CAE) support

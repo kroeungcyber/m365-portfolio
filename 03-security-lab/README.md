@@ -12,7 +12,7 @@ This project demonstrates a **production-hardened** Microsoft 365 security and c
 
 ## 🤖 AI Agent Defense Architecture
 
-Modern AI agents can autonomously enumerate APIs, replay tokens, and chain vulnerabilities at machine speed. This lab implements 8 layers of defense:
+Modern AI agents can autonomously enumerate APIs, replay tokens, inject prompts, and chain vulnerabilities at machine speed. This lab implements **11 layers of defense**:
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -24,32 +24,44 @@ Modern AI agents can autonomously enumerate APIs, replay tokens, and chain vulne
           └────────────────┬────────────────┘
                            │
           ┌────────────────▼────────────────┐
-          │  L2: AI Agent / Bot Detection   │  ← 28+ User-Agent patterns
+          │  L2: Geo-Aware Throttling       │  ← Cloud/AI IP tier limits
           └────────────────┬────────────────┘
                            │
           ┌────────────────▼────────────────┐
-          │  L3: Tiered Rate Limiting       │  ← Global + per-route limits
+          │  L3: Fingerprint Anomaly Detect │  ← Missing headers, headless UA
           └────────────────┬────────────────┘
                            │
           ┌────────────────▼────────────────┐
-          │  L4: Strict CORS Enforcement    │  ← Origin allowlist
+          │  L4: Prompt Injection Defense   │  ← 30+ LLM injection patterns
           └────────────────┬────────────────┘
                            │
           ┌────────────────▼────────────────┐
-          │  L5: Token Replay Prevention    │  ← JWT jti nonce store
+          │  L5: Agentic Chain Detection    │  ← Multi-step enumeration
           └────────────────┬────────────────┘
                            │
           ┌────────────────▼────────────────┐
-          │  L6: JWT Cryptographic Verify   │  ← RS256 + JWKS
+          │  L6: AI Agent / Bot Detection   │  ← 28+ User-Agent patterns
           └────────────────┬────────────────┘
                            │
           ┌────────────────▼────────────────┐
-          │  L7: MSAL OBO Flow              │  ← Entra ID token exchange
+          │  L7: Tiered Rate Limiting       │  ← Global + per-route limits
           └────────────────┬────────────────┘
                            │
           ┌────────────────▼────────────────┐
-          │  L8: RBAC Authorization         │  ← Group-based permissions
+          │  L8: Strict CORS Enforcement    │  ← Origin allowlist
           └────────────────┬────────────────┘
+                           │
+          ┌────────────────▼────────────────┐
+          │  L9: Token Replay Prevention    │  ← JWT jti nonce store
+          └────────────────┬────────────────┘
+                           │
+          ┌────────────────▼────────────────┐
+          │  L10: JWT Cryptographic Verify  │  ← RS256 + JWKS
+          └────────────────┬────────────────┘
+                           │
+          ┌────────────────▼────────────────┐
+          │  L11: MSAL OBO + RBAC           │  ← Entra ID + group permissions
+          └────────────────┘
                            │
                     ✅ AUTHORIZED
 ```
@@ -140,6 +152,10 @@ router.post('/admin',
 * **JWT Cryptographic Pre-Validation**: RS256 signature verification via Microsoft's JWKS endpoint before any MSAL call
 * **Header Injection Protection**: Regex sanitization and length limits on Authorization headers
 * **Sanitized Error Responses**: No internal details, stack traces, or MSAL error messages exposed
+* **Prompt Injection Defense**: 30+ regex patterns blocking LLM instruction overrides, jailbreaks, system prompt injections, and tool-call payloads (`promptInjectionDefense.js`)
+* **Agentic Chain Detection**: Tracks multi-step API call sequences — detects AI agents enumerating endpoints in rapid succession within a 30-second window
+* **Request Fingerprint Anomaly Detection**: Identifies headless browsers, missing browser headers, and suspicious User-Agent formats used by AI agents
+* **Geo-Aware Throttling**: Tiered rate limits based on IP origin — cloud/AI provider ranges (AWS, Azure, GCP, DigitalOcean, OVH) get tighter limits; auto-escalates repeat violators to flagged tier (`geoThrottle.js`)
 
 ### Microsoft 365 Security
 * **Data Loss Prevention (DLP)** policies for OneDrive and SharePoint
@@ -175,16 +191,18 @@ router.post('/admin',
 
 ```
 03-security-lab/
-├── .env.example          # Environment variable template (with all required vars)
-├── .gitignore            # Excludes .env and node_modules
-├── app.js                # Zero Trust hardened Express server
-├── authMiddleware.js     # JWT pre-validation, MSAL OBO, RBAC middleware
-├── aiAgentDefense.js     # AI agent detection, token replay, velocity defense
-├── logger.js             # Structured security event logging (12 categories)
-├── package.json          # Dependencies (includes jsonwebtoken, jwks-rsa)
-├── SECURITY.md           # Security policy
-├── ZERO-TRUST.md         # Zero Trust architecture & AI agent threat model
-├── test-demo.sh          # API testing script
+├── .env.example              # Environment variable template (with all required vars)
+├── .gitignore                # Excludes .env and node_modules
+├── app.js                    # Zero Trust hardened Express server (11-layer defense)
+├── authMiddleware.js         # JWT pre-validation, MSAL OBO, RBAC middleware
+├── aiAgentDefense.js         # AI agent detection, token replay, velocity defense
+├── promptInjectionDefense.js # Prompt injection, agentic chain & fingerprint detection
+├── geoThrottle.js            # Geo-aware rate limiting (cloud/AI IP tiers, Cambodia SME)
+├── logger.js                 # Structured security event logging (17 event categories)
+├── package.json              # Dependencies (includes jsonwebtoken, jwks-rsa)
+├── SECURITY.md               # Security policy
+├── ZERO-TRUST.md             # Zero Trust architecture & AI agent threat model
+├── test-demo.sh              # API testing script
 └── README.md
 ```
 

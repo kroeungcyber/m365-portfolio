@@ -32,6 +32,11 @@ AI-powered autonomous agents represent a new class of attacker that can:
 | Header injection | Regex sanitization + length limits | `authMiddleware.js` |
 | Information harvesting | Sanitized error responses (no internals leaked) | `app.js` + `authMiddleware.js` |
 | AI crawler indexing | `X-Robots-Tag: noindex, nofollow` | `aiAgentDefense.js` |
+| Prompt injection | 30+ LLM injection pattern detection (jailbreaks, system overrides, tool-call injection) | `promptInjectionDefense.js` |
+| Agentic chain attacks | Sequential endpoint enumeration tracking (5+ calls / 30s window) | `promptInjectionDefense.js` |
+| Cloud-hosted AI agents | Geo-aware IP tier throttling (AWS/Azure/GCP/DO get 4× tighter limits) | `geoThrottle.js` |
+| Regional botnet attacks | Auto-IP-flagging after repeated cloud/AI tier violations (24h escalation) | `geoThrottle.js` |
+| Fingerprint spoofing | Request header anomaly detection (headless UA, missing browser headers) | `promptInjectionDefense.js` |
 
 > 📄 See the full AI Agent defense architecture: [03-security-lab/ZERO-TRUST.md](./03-security-lab/ZERO-TRUST.md)
 
@@ -76,7 +81,7 @@ AI-powered autonomous agents represent a new class of attacker that can:
 | **NIST 800-53** | Identity proofing, access control, continuous monitoring, and audit logging. |
 | **NIST 800-207** | Zero Trust Architecture — verify explicitly, least privilege, assume breach. |
 | **GDPR** | Data Loss Prevention (DLP) and automated retention policies. |
-| **Zero Trust** | "Never Trust, Always Verify" applied to every API request with 8-layer defense-in-depth. |
+| **Zero Trust** | "Never Trust, Always Verify" applied to every API request with 11-layer defense-in-depth. |
 | **OWASP API Top 10** | Broken auth (API1), excessive data exposure (API3), rate limiting (API4), security misconfiguration (API7). |
 
 ---
@@ -85,10 +90,12 @@ AI-powered autonomous agents represent a new class of attacker that can:
 
 | File | Purpose |
 |:---|:---|
-| `03-security-lab/app.js` | Hardened Express server with tiered rate limiting, strict CORS, and Helmet CSP |
+| `03-security-lab/app.js` | Hardened Express server — 11-layer defense-in-depth, tiered rate limiting, strict CORS, Helmet CSP |
 | `03-security-lab/authMiddleware.js` | JWT pre-validation, MSAL OBO flow, RBAC enforcement, audit logging |
 | `03-security-lab/aiAgentDefense.js` | AI agent detection, token replay prevention, velocity anomaly detection |
-| `03-security-lab/logger.js` | Structured security event logging (12 event categories) |
+| `03-security-lab/promptInjectionDefense.js` | Prompt injection defense (30+ patterns), agentic chain detection, fingerprint anomaly detection |
+| `03-security-lab/geoThrottle.js` | Geo-aware IP tier throttling (cloud/AI provider ranges, auto-flagging, Cambodia SME context) |
+| `03-security-lab/logger.js` | Structured security event logging (17 event categories) |
 | `03-security-lab/ZERO-TRUST.md` | Full Zero Trust architecture and AI agent threat model documentation |
 
 ---

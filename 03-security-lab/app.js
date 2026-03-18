@@ -7,10 +7,12 @@
  *  2. AI Agent / Bot detection (aiAgentDefense.js)
  *  3. Token replay prevention
  *  4. Strict CORS
- *  5. Tiered rate limiting (global + per-route)
- *  6. Request fingerprinting headers
- *  7. Joi environment validation
- *  8. Structured security audit logging
+ *  5. Tiered rate limiting (global + per-route + geo-aware)
+ *  6. Request fingerprinting & anomaly detection
+ *  7. Prompt injection & agentic chain detection
+ *  8. Geo-aware throttling (cloud/AI provider IP tiers)
+ *  9. Joi environment validation
+ * 10. Structured security audit logging
  */
 
 require('dotenv').config();
@@ -27,6 +29,12 @@ const {
   preventTokenReplay,
   addSecurityHeaders,
 } = require('./aiAgentDefense');
+const {
+  detectPromptInjection,
+  detectAgenticChain,
+  detectFingerprintAnomaly,
+} = require('./promptInjectionDefense');
+const { geoThrottle, flagIP } = require('./geoThrottle');
 
 const app = express();
 
@@ -149,6 +157,19 @@ const authLimiter = rateLimit({
     res.status(options.statusCode).json(options.message);
   },
 });
+
+// ─── Geo-Aware Throttling (applied to all routes) ────────────────────────────
+// Applies tiered rate limits based on IP origin (cloud/AI provider vs standard)
+app.use(geoThrottle);
+
+// ─── Request Fingerprint Anomaly Detection (all routes) ──────────────────────
+// Logs anomalies (missing browser headers, headless UA, etc.) for enrichment
+app.use(detectFingerprintAnomaly);
+
+// ─── Prompt Injection & Agentic Chain Detection (all routes) ─────────────────
+// Blocks LLM injection payloads and multi-step AI agent enumeration patterns
+app.use(detectPromptInjection);
+app.use(detectAgenticChain);
 
 // ─── AI Agent Detection (applied to all routes) ───────────────────────────────
 app.use(detectAIAgent);
