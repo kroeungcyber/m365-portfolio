@@ -1,0 +1,240 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json",
+  "description": "SharePoint Online — Knowledge Base Document Library Configuration",
+  "version": "1.0.0",
+  "libraryDefinition": {
+    "title": "Knowledge Base",
+    "description": "Organisation-wide repository for SOPs, governance documents, best practices, and technical runbooks. Single source of truth — all documents undergo a mandatory approval workflow before publication.",
+    "template": "DocumentLibrary",
+    "enableVersioning": true,
+    "enableMinorVersions": true,
+    "majorVersionLimit": 20,
+    "minorVersionLimit": 5,
+    "requireCheckout": false,
+    "enableModeration": true,
+    "draftVisibility": "Author",
+    "onQuickLaunch": true,
+    "contentTypesEnabled": true,
+    "contentTypes": [
+      {
+        "name": "SOP Document",
+        "description": "Standard Operating Procedure — requires SME review and department head approval before publication",
+        "group": "Knowledge Base Content Types",
+        "documentTemplate": "templates/sop-template.dotx",
+        "requiredColumns": ["DocumentCategory", "DocumentOwner", "ReviewDate", "SensitivityLabel"]
+      },
+      {
+        "name": "Policy Document",
+        "description": "Organisational policies and governance documents",
+        "group": "Knowledge Base Content Types",
+        "documentTemplate": "templates/policy-template.dotx",
+        "requiredColumns": ["DocumentCategory", "DocumentOwner", "ReviewDate", "Audience", "SensitivityLabel"]
+      },
+      {
+        "name": "Technical Runbook",
+        "description": "Step-by-step technical procedures for IT operations and incident response",
+        "group": "Knowledge Base Content Types",
+        "documentTemplate": "templates/runbook-template.dotx",
+        "requiredColumns": ["DocumentCategory", "DocumentOwner", "ReviewDate"]
+      },
+      {
+        "name": "Best Practice Guide",
+        "description": "Guidance and recommended approaches for common tasks and tools",
+        "group": "Knowledge Base Content Types",
+        "requiredColumns": ["DocumentCategory", "DocumentOwner", "Audience"]
+      }
+    ],
+    "columns": [
+      {
+        "internalName": "DocumentCategory",
+        "displayName": "Category",
+        "type": "Choice",
+        "required": true,
+        "choices": [
+          "IT Operations",
+          "HR Policies",
+          "Finance Procedures",
+          "Legal & Compliance",
+          "Security",
+          "Onboarding",
+          "General"
+        ],
+        "indexed": true
+      },
+      {
+        "internalName": "DocumentOwner",
+        "displayName": "Document Owner",
+        "type": "User",
+        "required": true,
+        "description": "SME responsible for content accuracy and triggering the review cycle"
+      },
+      {
+        "internalName": "ReviewDate",
+        "displayName": "Next Review Date",
+        "type": "DateTime",
+        "required": true,
+        "dateOnly": true,
+        "description": "Scheduled date for mandatory content review. Power Automate sends a reminder 30 days before this date."
+      },
+      {
+        "internalName": "ApprovalStatus",
+        "displayName": "Approval Status",
+        "type": "Choice",
+        "required": true,
+        "choices": ["Draft", "In Review", "Approved", "Archived"],
+        "defaultValue": "Draft"
+      },
+      {
+        "internalName": "Audience",
+        "displayName": "Target Audience",
+        "type": "Choice",
+        "required": false,
+        "allowMultipleValues": true,
+        "choices": [
+          "All Staff",
+          "IT Only",
+          "HR Only",
+          "Management",
+          "Finance Only",
+          "Legal Only"
+        ],
+        "defaultValue": "All Staff"
+      },
+      {
+        "internalName": "SensitivityLabel",
+        "displayName": "Sensitivity",
+        "type": "Choice",
+        "required": true,
+        "choices": ["Public", "Internal", "Confidential", "Highly Confidential"],
+        "defaultValue": "Internal",
+        "description": "Aligned to Purview sensitivity label taxonomy. Confidential and above applies encryption."
+      },
+      {
+        "internalName": "ChangeLog",
+        "displayName": "Change Summary",
+        "type": "Note",
+        "required": false,
+        "richText": false,
+        "maxLength": 500,
+        "description": "Brief summary of changes in this version (e.g., 'Updated escalation path in Section 4')."
+      },
+      {
+        "internalName": "PurviewRetentionLabel",
+        "displayName": "Retention Label",
+        "type": "Choice",
+        "required": false,
+        "choices": [
+          "General Retention - 2 Years",
+          "Financial Records - 7 Years",
+          "Legal Hold - Indefinite",
+          "No Retention Applied"
+        ],
+        "description": "Microsoft Purview retention policy applied via Power Automate on document approval."
+      }
+    ],
+    "views": [
+      {
+        "name": "All Active Documents",
+        "defaultView": true,
+        "query": "<Where><Or><Eq><FieldRef Name='ApprovalStatus'/><Value Type='Choice'>Approved</Value></Eq><Eq><FieldRef Name='ApprovalStatus'/><Value Type='Choice'>In Review</Value></Eq></Or></Where>",
+        "orderBy": "<OrderBy><FieldRef Name='Modified' Ascending='FALSE'/></OrderBy>",
+        "columns": ["DocIcon", "LinkFilename", "DocumentCategory", "DocumentOwner", "ApprovalStatus", "ReviewDate", "Modified"]
+      },
+      {
+        "name": "Pending Review",
+        "description": "Documents currently In Review — used by approvers to act on pending items",
+        "query": "<Where><Eq><FieldRef Name='ApprovalStatus'/><Value Type='Choice'>In Review</Value></Eq></Where>",
+        "columns": ["DocIcon", "LinkFilename", "DocumentCategory", "DocumentOwner", "ReviewDate", "Modified"]
+      },
+      {
+        "name": "By Category",
+        "description": "Approved documents grouped by category — primary browsing view for end users",
+        "groupBy": "DocumentCategory",
+        "query": "<Where><Eq><FieldRef Name='ApprovalStatus'/><Value Type='Choice'>Approved</Value></Eq></Where>",
+        "columns": ["DocIcon", "LinkFilename", "DocumentOwner", "Audience", "ReviewDate", "SensitivityLabel"]
+      },
+      {
+        "name": "Due for Review (Next 30 Days)",
+        "description": "Documents whose Next Review Date falls within the next 30 days — Power Automate also sends email reminders",
+        "query": "<Where><And><Leq><FieldRef Name='ReviewDate'/><Value Type='DateTime'><Today OffsetDays='30'/></Value></Leq><Eq><FieldRef Name='ApprovalStatus'/><Value Type='Choice'>Approved</Value></Eq></And></Where>",
+        "orderBy": "<OrderBy><FieldRef Name='ReviewDate' Ascending='TRUE'/></OrderBy>",
+        "columns": ["DocIcon", "LinkFilename", "DocumentCategory", "DocumentOwner", "ReviewDate", "ApprovalStatus"]
+      },
+      {
+        "name": "Archived",
+        "description": "Superseded or retired documents — retained for audit purposes",
+        "query": "<Where><Eq><FieldRef Name='ApprovalStatus'/><Value Type='Choice'>Archived</Value></Eq></Where>",
+        "columns": ["DocIcon", "LinkFilename", "DocumentCategory", "Modified", "Editor", "PurviewRetentionLabel"]
+      }
+    ],
+    "approvalWorkflow": {
+      "description": "Power Automate cloud flow triggered when a document minor version is promoted to a major version",
+      "trigger": "SharePoint — When a file is classified as a record (major version created)",
+      "stages": [
+        {
+          "stage": 1,
+          "name": "SME Review",
+          "approver": "DocumentOwner field value",
+          "slaHours": 48,
+          "outcome": {
+            "approved": "Update ApprovalStatus to 'In Review', proceed to Stage 2",
+            "rejected": "Update ApprovalStatus to 'Draft', notify submitter via Teams Adaptive Card"
+          }
+        },
+        {
+          "stage": 2,
+          "name": "Department Head Sign-off",
+          "approver": "Resolved from DocumentCategory via a SharePoint lookup list mapping categories to department heads",
+          "slaHours": 72,
+          "outcome": {
+            "approved": "Update ApprovalStatus to 'Approved', apply Purview retention label via Graph API",
+            "rejected": "Update ApprovalStatus to 'In Review', notify DocumentOwner with rejection comments"
+          }
+        }
+      ],
+      "notifications": {
+        "channels": ["Teams Adaptive Card", "Outlook email"],
+        "events": {
+          "submitter": ["on_submission", "on_stage1_decision", "on_final_decision"],
+          "stage1Approver": ["on_assignment", "sla_reminder_24h"],
+          "stage2Approver": ["on_assignment", "sla_reminder_48h"],
+          "documentOwner": ["review_date_reminder_30d", "review_date_reminder_7d"]
+        }
+      }
+    },
+    "search": {
+      "verticalName": "Knowledge Base",
+      "verticalQuery": "ContentTypeId:0x0101* Path:https://contoso.sharepoint.com/sites/knowledgebase/*",
+      "managedProperties": ["DocumentCategory", "DocumentOwner", "ApprovalStatus", "Audience", "SensitivityLabel"],
+      "refiners": ["DocumentCategory", "Audience", "SensitivityLabel", "ReviewDate"],
+      "enableHighlighting": true,
+      "displayTemplate": "Compact — shows Title, Category, Owner, and Review Date"
+    },
+    "permissions": {
+      "breakRoleInheritance": true,
+      "copyRoleAssignments": false,
+      "roleAssignments": [
+        {
+          "group": "Knowledge Base Contributors",
+          "permission": "Contribute",
+          "note": "Can upload and edit drafts. Cannot publish (promote to major version)."
+        },
+        {
+          "group": "Knowledge Base Readers",
+          "permission": "Read",
+          "note": "Can view and download approved documents only. Draft and In Review documents are hidden."
+        },
+        {
+          "group": "Knowledge Base Approvers",
+          "permission": "Approve",
+          "note": "Can promote minor versions to major versions, triggering the approval workflow."
+        },
+        {
+          "group": "Knowledge Base Owners",
+          "permission": "Full Control",
+          "note": "IT/HR admin group — manage library settings, content types, and column schema."
+        }
+      ]
+    }
+  }
+}

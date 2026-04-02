@@ -3,6 +3,9 @@
 [![SME Roadmap](https://img.shields.io/badge/Roadmap-SME%20Transformation-orange.svg)](SME-TRANSFORMATION.md)
 [![Security Policy](https://img.shields.io/badge/Security-Policy-brightgreen.svg)](SECURITY.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Security Lab CI](https://github.com/kroeungcyber/m365-portfolio/actions/workflows/security-lab-ci.yml/badge.svg)](https://github.com/kroeungcyber/m365-portfolio/actions/workflows/security-lab-ci.yml)
+[![Provisioner CI](https://github.com/kroeungcyber/m365-portfolio/actions/workflows/provisioner-ci.yml/badge.svg)](https://github.com/kroeungcyber/m365-portfolio/actions/workflows/provisioner-ci.yml)
+[![GitHub Pages](https://github.com/kroeungcyber/m365-portfolio/actions/workflows/pages.yml/badge.svg)](https://kroeungcyber.github.io/m365-portfolio)
 
 This portfolio demonstrates a comprehensive toolkit for **Digital Transformation in Small and Medium Enterprises (SMEs)**. By leveraging Microsoft 365, these projects show how SMEs can achieve enterprise-grade security, collaboration, and automation without a massive IT budget.
 
@@ -95,6 +98,21 @@ This portfolio demonstrates a comprehensive toolkit for **Digital Transformation
 
 ---
 
+### 7. M365 Workplace Provisioner (PowerShell + Graph API)
+
+**Summary:** A declarative, automated M365 workplace provisioner that reads a single `workspace-config.json` and provisions an entire Microsoft 365 environment — SharePoint sites, Teams, Entra ID groups, sensitivity labels, DLP policies, and Conditional Access settings — in one command.
+
+**Key Highlights:**
+* **Declarative Config**: All tenant resources defined in `workspace-config.json` — no imperative scripting required.
+* **Zero Trust by Design**: No hardcoded credentials, least-privilege service principal, full audit logging, dry-run mode.
+* **Idempotent**: Existing resources are detected and skipped — safe to re-run without creating duplicates.
+
+**Skills Demonstrated:**
+
+* PnP PowerShell, Microsoft Graph API, Entra ID governance, Infrastructure-as-Code for M365.
+
+---
+
 ## 🧰 Tools Used
 
 * SharePoint Online
@@ -141,6 +159,7 @@ m365-portfolio/
 ├── 04-custom-teams-app/       # Teams integration solutions
 ├── 05-training-support-portal/# User adoption & training resources
 ├── 06-documentation-library/  # Document lifecycle management
+├── 07-m365-provisioning/      # Declarative PowerShell provisioner for full M365 tenant setup
 ├── SECURITY.md                # Project-wide Security Posture
 └── README.md
 ```
