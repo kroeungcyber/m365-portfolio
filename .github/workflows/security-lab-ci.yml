@@ -1,0 +1,41 @@
+name: Security Lab CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '03-security-lab/**'
+      - '.github/workflows/security-lab-ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '03-security-lab/**'
+      - '.github/workflows/security-lab-ci.yml'
+
+jobs:
+  ci:
+    name: Node.js Syntax & Audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 03-security-lab
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 03-security-lab/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Syntax check all JS files
+        run: node --check app.js authMiddleware.js aiAgentDefense.js promptInjectionDefense.js geoThrottle.js logger.js
+
+      - name: Dependency vulnerability audit
+        run: npm audit --audit-level=moderate
