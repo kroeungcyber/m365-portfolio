@@ -1,0 +1,45 @@
+name: Provisioner CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '07-m365-provisioning/**'
+      - '.github/workflows/provisioner-ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '07-m365-provisioning/**'
+      - '.github/workflows/provisioner-ci.yml'
+
+jobs:
+  validate:
+    name: JSON + PowerShell Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate workspace-config.json
+        run: |
+          python3 -m json.tool 07-m365-provisioning/workspace-config.json > /dev/null
+          echo "workspace-config.json is valid JSON"
+
+      - name: PowerShell syntax check
+        shell: pwsh
+        run: |
+          $errors = $null
+          $null = [System.Management.Automation.Language.Parser]::ParseFile(
+            "${{ github.workspace }}/07-m365-provisioning/Provision-M365Workplace.ps1",
+            [ref]$null,
+            [ref]$errors
+          )
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Error $_.Message }
+            exit 1
+          }
+          Write-Host "Provision-M365Workplace.ps1 syntax OK"
+
+      - name: Summary
+        run: echo "All provisioner checks passed — no tenant credentials required"
