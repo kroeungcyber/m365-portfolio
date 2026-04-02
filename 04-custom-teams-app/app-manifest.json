@@ -1,0 +1,122 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.17/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.17",
+  "version": "1.0.0",
+  "id": "00000000-0000-0000-0000-000000000001",
+  "packageName": "com.contoso.m365.eventplanner",
+  "developer": {
+    "name": "Contoso IT",
+    "websiteUrl": "https://contoso.onmicrosoft.com",
+    "privacyUrl": "https://contoso.onmicrosoft.com/privacy",
+    "termsOfUseUrl": "https://contoso.onmicrosoft.com/terms"
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "name": {
+    "short": "Event Planner",
+    "full": "Contoso Internal Event Planner"
+  },
+  "description": {
+    "short": "Plan events and access documents in Teams",
+    "full": "Centralise internal event scheduling and document retrieval directly inside Microsoft Teams. Powered by Power Apps canvas app and SharePoint Online — no context switching required."
+  },
+  "accentColor": "#0078D4",
+  "staticTabs": [
+    {
+      "entityId": "eventPlannerTab",
+      "name": "Events",
+      "contentUrl": "https://apps.powerapps.com/play/00000000-0000-0000-0000-000000000002?tenantId=00000000-0000-0000-0000-000000000003&source=teams&hint={groupId}",
+      "websiteUrl": "https://apps.powerapps.com/play/00000000-0000-0000-0000-000000000002",
+      "scopes": ["personal", "team"]
+    },
+    {
+      "entityId": "documentsTab",
+      "name": "Documents",
+      "contentUrl": "https://contoso.sharepoint.com/sites/events/_layouts/15/teamslogon.aspx?spfx=true&dest=/sites/events/Shared%20Documents/Forms/AllItems.aspx",
+      "websiteUrl": "https://contoso.sharepoint.com/sites/events/Shared%20Documents",
+      "scopes": ["personal", "team"]
+    }
+  ],
+  "configurableTabs": [
+    {
+      "configurationUrl": "https://contoso.sharepoint.com/sites/events/_layouts/15/TeamsTabConfig.aspx",
+      "canUpdateConfiguration": true,
+      "scopes": ["team", "groupChat"],
+      "context": [
+        "channelTab",
+        "privateChatTab",
+        "meetingChatTab",
+        "meetingDetailsTab",
+        "meetingSidePanel"
+      ],
+      "sharePointPreviewImage": "https://contoso.sharepoint.com/sites/events/SiteAssets/teams-preview.png",
+      "supportedSharePointHosts": ["sharePointFullPage", "sharePointWebPart"]
+    }
+  ],
+  "bots": [],
+  "connectors": [],
+  "composeExtensions": [],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "validDomains": [
+    "contoso.sharepoint.com",
+    "apps.powerapps.com",
+    "login.microsoftonline.com",
+    "*.sharepoint.com"
+  ],
+  "webApplicationInfo": {
+    "id": "00000000-0000-0000-0000-000000000001",
+    "resource": "api://contoso.onmicrosoft.com/00000000-0000-0000-0000-000000000001"
+  },
+  "authorization": {
+    "permissions": {
+      "resourceSpecific": [
+        {
+          "name": "ChannelSettings.Read.Group",
+          "type": "Application"
+        },
+        {
+          "name": "TeamSettings.Read.Group",
+          "type": "Application"
+        },
+        {
+          "name": "TeamMember.Read.Group",
+          "type": "Application"
+        }
+      ]
+    }
+  },
+  "localizationInfo": {
+    "defaultLanguageTag": "en-us"
+  },
+  "showLoadingIndicator": true,
+  "isFullScreen": false,
+  "activities": {
+    "activityTypes": [
+      {
+        "type": "eventReminder",
+        "description": "Reminder sent before a scheduled event starts",
+        "templateText": "{actor} reminder: <b>{eventTitle}</b> starts in {timeUntil}."
+      },
+      {
+        "type": "newEventCreated",
+        "description": "Notification when a new event is added to the calendar",
+        "templateText": "{actor} added a new event: <b>{eventTitle}</b> on {eventDate}."
+      },
+      {
+        "type": "eventUpdated",
+        "description": "Notification when an existing event is modified",
+        "templateText": "{actor} updated <b>{eventTitle}</b>. {changeDetail}."
+      },
+      {
+        "type": "rsvpReceived",
+        "description": "Notification when an attendee responds to an event",
+        "templateText": "{actor} responded <b>{rsvpStatus}</b> to {eventTitle}."
+      }
+    ]
+  }
+}
